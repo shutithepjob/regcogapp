@@ -1,5 +1,4 @@
 import { Pool } from 'pg';
-// import postgres from 'postgres';
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL
