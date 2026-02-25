@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@vercel/postgres": "^0.10.0",
+    "face-api.js": "^0.22.2",
     "next": "16.1.6",
     "pg": "^8.18.0",
     "postgres": "^3.4.8",
