@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import * as faceapi from 'face-api.js';
+import Link from 'next/link';
 
 export default function FaceCompareDetection() {
 
@@ -76,9 +77,13 @@ export default function FaceCompareDetection() {
     };
 
     return (
-        <div className="flex m-2 items-center justify-center flex-col bg-white">
+        <div className="flex m-2 items-center justify-center flex-col bg-blue-500/10">
+            <br />
+            <Link href="/main" className="bg-blue-600 px-4 py-2 text-xl text-white font-bold rounded-md hover:bg-blue-700 transition-colors">ย้อนกลับ</Link>
+            <br />
             <h1 className="text-2xl font-bold">ระบบตรวจเช็คใบหน้า</h1>
-            {!modelsLoaded && <p>กำลังโหลด Models...</p>}
+            
+            {!modelsLoaded && <p className="m-10">กำลังโหลด Models...</p>}
             <div className="flex gap-4">
                 <div>
                     <p>รูปที่ 1</p>
@@ -113,7 +118,7 @@ export default function FaceCompareDetection() {
                     }
                 </div>
             </div>
-
+            <br />
             <button
                 onClick={compareFaces}
                 disabled={!modelsLoaded}
@@ -121,8 +126,9 @@ export default function FaceCompareDetection() {
             >
                 เปรียบเทียบ
             </button>
-
+            <br />
             {result && <div className="text-xl font-semibold mt-4 text-blue-600">{result}</div>}
+            <br />
         </div>
     );
 }

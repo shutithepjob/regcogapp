@@ -1,50 +1,50 @@
-'use client'
-
-import { useState, useEffect } from 'react';
-
-import { Spinner } from '@/app/spinner';
-import { handleInsertCustomers } from '@/app/main/action'
-import { handleGetCustomers } from '@/app/main/action';
 import Link from 'next/link';
+import ShowPersonsPage from './showPersons';
+import { auth } from "@/auth";
+import LogoutButton from '../logoutButton';
 
+export default async function Page() {
+  //const { data: session, status } = useSession(); //ของฝั่ง Client
+  const session = await auth();
 
+  return (
+    <div className="flex flex-col justify-center items-center m-10">
+      <h1 className="font-bold text-4xl">แสดงรายการคนหาย</h1>
 
-export default function Page() {
-    const [customers, setCustomers] = useState<any[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
+      <br />
 
-    useEffect(() => {
-        const fectData = async () => {
-            try {
-                setLoading(true);
-                const data = await handleGetCustomers();
-                setCustomers(data);
-            } catch (error) {
-                console.error("Error : "+error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fectData();
-    }, []);
+      <ShowPersonsPage />
 
-    return (
-        <div className="justify-center items-center">
-            <h1>แสดงรายการ</h1>
-            <Link href="/main/facedetect" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                กดไปหน้า face detect
-            </Link>
-            {
-                loading && <div>กำลังโหลด</div>
-            }
-            {
-                customers.map((customer: any) => (
-                    <div key={customer.id}>
-                        <p>{customer.name}</p>
-                    </div>
-                ))
-            }
-        </div>
-    );
+      <br />
+
+      <Link
+        href="/main/facedetect"
+        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+      >
+        กดไปหน้า face detect
+      </Link>
+
+      <br />
+
+      <p>ชื่อผู้ใช้ : {session?.user?.email ? session?.user?.email : 'ผู้ไม่ระบุตัวตน'}</p>
+
+      {
+        session && (
+          <LogoutButton / >
+        )
+      }
+
+      {
+        !session && (
+          <Link
+            href="/login"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            เข้าสู่ระบบ
+          </Link>
+        )
+      }
+
+    </div>
+  );
 }
-
