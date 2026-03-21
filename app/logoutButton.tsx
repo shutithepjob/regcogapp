@@ -9,6 +9,11 @@ export default function LogoutButton() {
     const [isLoading, setIsLoading] = useState(false);
 
     const signOutProcess = async () => {
+        const isConfirm = confirm("ยืนยันล็อกเอาท์");
+        if (!isConfirm) {
+            return false;
+        }
+        
         setIsLoading(true);
 
         await signOut({

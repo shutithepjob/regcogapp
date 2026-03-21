@@ -4,6 +4,39 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { InsertCustomers } from '@/app/main/data';
 import { GetCustomers } from '@/app/main/data';
+import { Get_PersonData, Delete_PersonData } from '@/app/addPerson/data';
+
+export async function DelPersonData() {
+    let status: boolean = false;
+    try {
+        await Delete_PersonData();
+        status = true;
+    } catch (err) {
+        const errStr = "Error DelPersonData => ";
+        console.error(errStr + err);
+        throw new Error(errStr + err);
+    }
+
+    if (status) {
+        revalidatePath('/main');
+        redirect('/main');
+    }
+}
+
+export async function ShowPersonData() {
+    try {
+        const rows = await Get_PersonData();
+        if (rows.length > 0) {
+            return rows;
+        } else {
+            return false;
+        }
+    } catch (err) {
+        const errStr = "Error ShowPersonData => ";
+        console.error(errStr + err);
+        throw new Error(errStr + err);
+    }
+}
 
 export async function handleInsertCustomers(formData: FormData) {
     let success: boolean = false;

@@ -11,6 +11,11 @@ export default function LoginForm() {
     const handleSubmit = async (e: any) => {
         e.preventDefault();
 
+        const isConfirm = confirm("ยืนยันล็อกอิน");
+        if (!isConfirm) {
+            return false
+        }
+
         setIsLoading(true);
 
         const formData = new FormData(e.currentTarget);

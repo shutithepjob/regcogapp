@@ -42,19 +42,35 @@ export default async function RootLayout({
               <nav className="p-2">
                 <Link href="/" className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg">Home</Link>
               </nav>
-
               <nav className="p-2">
                 {
                   session?.user?.email
-                    ? 
+                    ?
                     <LogoutButton />
                     :
                     <Link href="/login" className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg">Log in</Link>
-                }  
+                }
+              </nav>
+              <nav className="p-2">
+                <Link
+                  href="/facedetect"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Face Detect
+                </Link>
               </nav>
               <nav className="p-2">
                 <Link href="/main" className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg">ข้อมูลคนหาย</Link>
               </nav>
+              {
+                session?.user?.email
+                &&
+                <nav className="p-2">
+                  <Link href="/addPerson" className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg">
+                    เพิ่มข้อมูล
+                  </Link>
+                </nav>
+              }
             </aside>
 
             <main className="flex-1">
