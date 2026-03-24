@@ -3,8 +3,45 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { InsertCustomers } from '@/app/main/data';
-import { GetCustomers } from '@/app/main/data';
-import { Get_PersonData, Delete_PersonData } from '@/app/addPerson/data';
+import { GetCustomers,GetPersonData_Search } from '@/app/main/data';
+import { 
+    Get_PersonData, 
+    Delete_PersonData, 
+} 
+    from '@/app/addPerson/data';
+
+export async function UploadPicture(formData: FormData) {
+    let status: boolean = false;
+    try {
+        
+    } catch (err) {
+        const errStr = "Error UploadPicture => ";
+        console.error(errStr + err);
+        throw new Error(errStr + err);
+    }
+
+    if (status) {
+        return true;
+    }
+}
+
+export async function GetPersonDataWithSearch(term: string) {
+    let status: boolean = false;
+    let rows: any[] = [];
+    try {
+        rows = await GetPersonData_Search(term);
+        status = true;
+    } catch (err) {
+        const errStr = "Error GetPersonDataWithSearch => ";
+        console.error(errStr + err);
+        throw new Error(errStr + err);
+    }
+
+    if (status) {
+        //revalidatePath('/main');
+        return rows;
+    }
+}
 
 export async function DelPersonData() {
     let status: boolean = false;

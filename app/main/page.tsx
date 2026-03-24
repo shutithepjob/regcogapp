@@ -2,13 +2,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { auth } from "@/auth";
 import LogoutButton from '../logoutButton';
-import { ShowPersonData } from './action';
+import { ShowPersonData,GetPersonDataWithSearch } from './action';
 import DeletePersonData from '@/app/DeleteAllPersonData';
+import SearchPerson from './searchPerson';
 
-export default async function Page() {
+export default async function Page(props: {searchParams: Promise<{query?: string}>}) {
   //const { data: session, status } = useSession(); //ของฝั่ง Client
   const session = await auth();
-  const dataPerson = await ShowPersonData();
+
+  const searchParams = await props.searchParams;
+  const searchTerm = searchParams?.query || '';
+  const dataPerson = await GetPersonDataWithSearch(searchTerm);
 
   return (
     <div className="flex flex-col justify-center items-center m-10 gap-5">
@@ -25,7 +29,7 @@ export default async function Page() {
             'ผู้ไม่ระบุตัวตน'
         }
       </div>
-      <h1 className="font-bold text-4xl">จัดการรายการคนหาย</h1>
+      <h1 className="font-bold text-3xl">จัดการรายการคนหาย</h1>
       <div className="flex flex-row gap-2">
         {
           session?.user?.email && <DeletePersonData />
@@ -42,7 +46,9 @@ export default async function Page() {
         }
       </div>
 
-      <h1>แสดงรายการคนหาย</h1>
+      <SearchPerson />
+
+      <h1 className="font-bold text-3xl">แสดงรายการคนหาย</h1>
       <div className="grid grid-cols-3 gap-10">
         {
           dataPerson
