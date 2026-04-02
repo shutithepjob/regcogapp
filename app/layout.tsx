@@ -34,43 +34,50 @@ export default async function RootLayout({
       <body>
         <SessionProvider>
           <div className="flex min-h-screen">
-            <aside className="bg-red-100 w-40 text-center p-2">
-              <div className="p-2">
-                <h1 className="text-xl font-bold">รายการต่างๆ</h1>
-                <h2>ชื่อผู้ใช้  : {session?.user?.email ? session?.user?.email : 'anon'}</h2>
+            <aside className="bg-slate-900 text-white w-52 p-6 text-center shadow-lg">
+              <div className="mb-8">
+                <h1 className="text-2xl font-bold mb-2">รายการต่างๆ</h1>
+                <h2 className="text-slate-300">ชื่อผู้ใช้  : {session?.user?.email ? session?.user?.email : 'anon'}</h2>
               </div>
-              <nav className="p-2">
-                <Link href="/" className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg">Home</Link>
-              </nav>
-              <nav className="p-2">
+              <nav className="space-y-2">
+                <Link
+                  href="/"
+                  className="block px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                >
+                  Home
+                </Link>
                 {
                   session?.user?.email
                     ?
                     <LogoutButton />
                     :
-                    <Link href="/login" className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg">Log in</Link>
+                    <Link href="/login" className="block px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg">Login</Link>
                 }
-              </nav>
-              <nav className="p-2">
                 <Link
                   href="/facedetect"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  className="block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                 >
                   Face Detect
                 </Link>
-              </nav>
-              <nav className="p-2">
-                <Link href="/main" className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg">ข้อมูลคนหาย</Link>
-              </nav>
-              {
-                session?.user?.email
-                &&
-                <nav className="p-2">
-                  <Link href="/addPerson" className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg">
+                <Link
+                  href="/main"
+                  className="block px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg"
+                >
+                  ข้อมูลคนหาย
+                </Link>
+                {
+                  session?.user?.email
+                  &&
+                  <Link
+                    href="/addPerson"
+                    className="block px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg"
+                  >
                     เพิ่มข้อมูล
                   </Link>
-                </nav>
-              }
+
+                }
+              </nav>
+
             </aside>
 
             <main className="flex-1">

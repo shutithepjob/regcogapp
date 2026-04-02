@@ -1,6 +1,6 @@
 'use client'
 
-import { DelPersonData } from '@/app/main/action';
+import { DelPersonData } from '@/app/mainTest/action';
 
 export default function DeletePersonData() {
     

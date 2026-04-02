@@ -12,10 +12,10 @@ export default function SearchPerson() {
     const { replace } = useRouter();
 
     const [image, setImage] = useState<string | null>(null);
-    const [image2, setImage2] = useState<string | null>(null);
-    const [result, setResult] = useState<string>("รูปที่กำลังจะแสดงตอนค้นหา");
-    const [user_image, setUser_Image] = useState<string>(`/next.svg`);
-    const [result_image, setResult_image] = useState<string>('/cat_trumbs_up.jpg');
+    const [result, setResult] = useState<string>("รูปที่กำลังจะแสดงตอนค้นหา(เมื่อทำการกดUpload)");
+    const [user_image, setUser_Image] = useState<string>('');
+    const [result_image, setResult_image] = useState<string>('');
+    const [isMatched, setIsMatched] = useState<boolean>(false);
 
     useEffect(() => {
         const loadModels = async () => {
@@ -46,6 +46,8 @@ export default function SearchPerson() {
     };
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>, setImage: Function) {
+        setResult_image('');
+        setResult("รูปที่กำลังจะแสดงตอนค้นหา");
         if (e.target.files && e.target.files[0]) {
             setImage(URL.createObjectURL(e.target.files[0]));
             setUser_Image(URL.createObjectURL(e.target.files[0]));
@@ -53,14 +55,17 @@ export default function SearchPerson() {
     }
 
     async function handleClickUpload() {
-
         const chk: string = await compareFaces();
         if (chk == "NoImage") {
             alert("อัพโหลดรูปก่อน");
         }
         else if (chk == "NotFound") {
-            setResult_image(`/CryingCat.jpg`);
-            setResult("ขออภัยรูปภาพที่อัพโหลดตรวจหาไม่เจอ กรุณาลองอัพโหลดรูปใหม่");
+            setIsMatched(false);
+            setResult_image('/file.svg');//ปรับให้ไม่ต้องแสดงรูปเพราะ ยังไม่มีรูปที่ควรให้แสดงถ้าเกิดค้นหาไม่พบ
+            setResult("❌ ไม่พบข้อมูลคนที่ตรงกับรูปภาพ กรุณาลองอัพโหลดรูปใหม่");
+        }
+        else if (chk == "Found") {
+            setIsMatched(true);
         }
     }
 
@@ -69,7 +74,7 @@ export default function SearchPerson() {
             return "NoImage";
         }
 
-        setResult_image(`/next.svg`);
+        //setResult_image(`/next.svg`);
         setResult("กำลังประมวลผล...");
 
         const option = new faceapi.TinyFaceDetectorOptions(
@@ -93,15 +98,12 @@ export default function SearchPerson() {
                     .withFaceLandmarks().withFaceDescriptor();
 
                 const distance = desc1 && desc2 ? faceapi.euclideanDistance(desc1.descriptor, desc2.descriptor) : 1.0;
-                //console.log("distance : " + distance);
                 if (distance < 0.3) {
                     setResult_image(`/uploads/${data.person_picture}`);
-                    setResult(`เป็นคนเดียวกัน (ค่าความต่าง: ${distance.toFixed(4)}) `);
+                    setResult(`✅ เป็นคนเดียวกัน (ค่าความต่าง: ${distance.toFixed(4)}) `);
+                    setIsMatched(true);
                     chkFound = true;
                     break;
-                } else {
-                    setResult_image(`/uploads/${data.person_picture}`);
-                    setResult(`คนละคนกัน (ค่าความต่าง: ${distance.toFixed(4)})`);
                 }
             } catch (err) {
                 alert("Error process Detection" + err);
@@ -112,71 +114,164 @@ export default function SearchPerson() {
         if (chkFound) {
             return "Found";
         } else {
+            setIsMatched(false);
             return "NotFound";
         }
     };
 
     return (
-
-        <div className="flex flex-col w-full gap-4 justify-center items-center">
-            <div className="flex flex-row w-full gap-4 justify-center items-center">
-                <label htmlFor="searchInput" >กรอกค้นหาชื่อ</label>
+        <div className="w-full space-y-6">
+            {/* Search by Name */}
+            <div className="space-y-3">
+                <label htmlFor="searchInput" className="block font-bold text-gray-800">
+                    🔍 ค้นหาชื่อ
+                </label>
                 <input
                     type="text"
                     id="searchInput"
-                    className="w-sm p-2 rounded-lg shadow-sm border focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition text-gray-800 placeholder-gray-500"
+                    placeholder="พิมพ์ชื่อคนที่ต้องการค้นหา..."
                     onChange={(e) => { handleSearch(e.target.value) }}
                     defaultValue={searchParams.get('query')?.toString()}
                 />
             </div>
 
-            <div className="flex flex-row w-full gap-4 justify-center items-center">
-                <label htmlFor="search_image" >ค้นหาจากไฟล์รูป</label>
-                <input
-                    type="file"
-                    id="search_image"
-                    name="search_image"
-                    className="w-sm p-2 rounded-lg shadow-sm border focus:ring-2 focus:ring-blue-500 outline-none file:text-blue-500"
-                    accept="image/*"
-                    onChange={(e) => { handleChange(e, setImage) }}
-                />
-                <button
-                    onClick={handleClickUpload}
-                    className="bg-yellow-500 hover:bg-yellow-600 rounded text-white p-2"
-                >
-                    Upload
-                </button>
-            </div>
-            <br />
-            <h1 className="font-bold text-3xl">ค้นหาคนหายด้วยรูปภาพ</h1>
-            <div className="flex flex-row gap-5 justify-center items-center">
-                <div className="flex flex-col gap-4 justify-center items-center ">
-                    <span>รูปที่คุณอัพโหลด</span>
-                    <Image
-                        src={user_image}
-                        alt="user_upload"
-                        width={200}
-                        height={200}
+            <div className="border-t-2 border-gray-300 pt-6">
+                <h3 className="font-bold text-gray-800 mb-4">🖼️ ค้นหาด้วยรูปภาพ</h3>
+
+                {/* File Upload Section */}
+                <div className="space-y-3 mb-6">
+                    <label htmlFor="search_image" className="block">
+                        <div className="border-2 border-dashed border-blue-400 rounded-lg p-8 text-center hover:bg-blue-50 transition cursor-pointer">
+                            <div className="text-4xl mb-2">📸</div>
+                            <p className="font-semibold text-gray-800">คลิกเพื่อเลือกรูป</p>
+                            <p className="text-sm text-gray-600">หรือลากรูปมาวางที่นี่</p>
+                        </div>
+                    </label>
+                    <input
+                        type="file"
+                        id="search_image"
+                        name="search_image"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={(e) => { handleChange(e, setImage) }}
                     />
                 </div>
-                {
-                    result_image &&
-                    <div className="flex flex-col gap-4 justify-center items-center ">
-                        <span>{result}</span>
-                        <Image
-                            src={result_image}
-                            alt="system_upload"
-                            width={200}
-                            height={200}
-                        />
-                        
+
+                {/* Image Preview and Results */}
+                <div className="space-y-6">
+                    {/* Images Grid - Top Section */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* User Uploaded Image */}
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <p className="font-semibold text-gray-800 mb-3">รูปที่คุณอัพโหลด</p>
+                            {!user_image ? (
+                                <div className="h-64 flex items-center justify-center text-gray-500 text-center">
+                                    <p>รูปภาพจะแสดงตรงนี้</p>
+                                </div>
+                            ) : (
+                                <Image
+                                    src={user_image}
+                                    alt="user_upload"
+                                    width={300}
+                                    height={300}
+                                    className="w-full rounded-lg object-cover"
+                                />
+                            )}
+                        </div>
+
+                        {/* Result Image */}
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <p className="font-semibold text-gray-800 mb-3">ภาพผลค้นหา</p>
+                            {result_image && !isMatched ? (
+                                <div className="h-64 flex flex-col justify-center items-center text-center">
+                                    <p>{result}</p>
+                                    {/* <Image
+                                        src={result_image}
+                                        alt="not_found"
+                                        width={300}
+                                        height={300}
+                                        className="w-full rounded-lg object-cover"
+                                    /> */}
+                                </div>
+                            ) : result_image && isMatched ? (
+                                <Image
+                                    src={result_image}
+                                    alt="system_result"
+                                    width={300}
+                                    height={300}
+                                    className="w-full rounded-lg object-cover"
+                                />
+                            ) : (
+                                <div className="h-64 flex items-center justify-center text-gray-500 text-center">
+                                    <p>รูปผลค้นหาจะแสดงตรงนี้</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                }
 
+                    {/* Results Header - Bottom Section */}
+                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <p className="font-semibold text-gray-800 mb-3">ผลการค้นหา</p>
+                        {result === "กำลังประมวลผล..." ? (
+                            <div className="h-20 flex items-center justify-center">
+                                <div className="text-center">
+                                    <div className="inline-block">
+                                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-3"></div>
+                                        <p className="text-blue-600 font-bold text-lg">{result}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : result_image && !isMatched ? (
+                            <div className="bg-red-100 border-2 border-red-500 p-4 rounded-lg text-center">
+                                <p className="text-red-700 font-bold text-base">{result}</p>
+                            </div>
+                        ) : result_image && isMatched ? (
+                            <div className="space-y-3">
+                                <div className="bg-green-100 border-2 border-green-500 p-4 rounded-lg text-center">
+                                    <p className="text-green-700 font-bold text-lg">✅ {result}</p>
+                                </div>
+                                <div className="space-y-2">
+                                    <button
+                                        onClick={() => {
+                                            alert("ไปหน้ารายละเอียดเพิ่มเติม");
+                                        }}
+                                        className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg transition"
+                                    >
+                                        ดูรายละเอียดเพิ่มเติม
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setResult_image('');
+                                            setImage(null);
+                                            setUser_Image('');
+                                            setIsMatched(false);
+                                            setResult("รูปที่กำลังจะแสดงตอนค้นหา(เมื่อทำการกดUpload)");
+                                        }}
+                                        className="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 rounded-lg transition"
+                                    >
+                                        ค้นหาใหม่
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="h-20 flex items-center justify-center">
+                                <p className="text-gray-500 text-center text-sm px-4">{result}</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Upload Button */}
+                {image && (
+                    <button
+                        onClick={handleClickUpload}
+                        className="w-full mt-6 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold py-3 rounded-lg transition-all shadow-md hover:shadow-lg"
+                    >
+                        🚀 ค้นหา
+                    </button>
+                )}
             </div>
-
         </div>
-
-
     );
 }
