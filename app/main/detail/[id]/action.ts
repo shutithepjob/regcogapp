@@ -2,13 +2,13 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-// import { InsertCustomers } from '@/app/main/data';
-// import { GetCustomers,GetPersonData_Search } from '@/app/main/data';
-// import { 
-//     Get_PersonData, 
-//     Delete_PersonData, 
-// } 
-//     from '@/app/addPerson/data';
+import { InsertCustomers } from '@/app/main/data';
+import { GetCustomers,GetPersonData_Search } from '@/app/main/data';
+import { 
+    Get_PersonData, 
+    Delete_PersonData, 
+} 
+    from '@/app/addPerson/data';
 import { GetPersonData_ID } from './data';
 
 export async function GetPersonDataWithID(id: string) {
